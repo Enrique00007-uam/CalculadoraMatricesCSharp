@@ -48,7 +48,7 @@ namespace CalculadoraMatrices
             int filas = matriz.GetLength(0);
             int columnas = matriz.GetLength(1);
 
-            
+         
             int longitudMaxima = 0;
             for (int i = 0; i < filas; i++)
             {
@@ -70,6 +70,26 @@ namespace CalculadoraMatrices
                 matrizComoTexto = matrizComoTexto.TrimEnd() + "]\n";
             }
             return matrizComoTexto;
+        }
+
+        
+        public static string MostrarMatriz(double[,] matriz)
+        {
+            int filas = matriz.GetLength(0);
+            int columnas = matriz.GetLength(1);
+
+            // Convertir números a strings con formato consistente
+            string[,] matrizTexto = new string[filas, columnas];
+            for (int i = 0; i < filas; i++)
+            {
+                for (int j = 0; j < columnas; j++)
+                {
+                    matrizTexto[i, j] = matriz[i, j].ToString("F2"); 
+                }
+            }
+
+         
+            return MostrarPasos(matrizTexto);
         }
     }
 }

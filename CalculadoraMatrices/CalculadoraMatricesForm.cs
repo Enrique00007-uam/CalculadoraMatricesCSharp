@@ -8,17 +8,17 @@ namespace CalculadoraMatrices
 {
     public partial class CalculadoraMatricesForm : Form
     {
-        
+        // Controles para matriz A
         private NumericUpDown spinFilasA;
         private NumericUpDown spinColumnasA;
         private DataGridView tablaMatrizA;
 
-     
+        // Controles para matriz B
         private NumericUpDown spinFilasB;
         private NumericUpDown spinColumnasB;
         private DataGridView tablaMatrizB;
 
-        
+        // Otros controles
         private RichTextBox pizarra;
 
         public CalculadoraMatricesForm()
@@ -36,14 +36,14 @@ namespace CalculadoraMatrices
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(240, 240, 240);
 
-            
+            // Layout principal
             TableLayoutPanel layoutPrincipal = new TableLayoutPanel();
             layoutPrincipal.Dock = DockStyle.Fill;
             layoutPrincipal.RowCount = 4;
             layoutPrincipal.ColumnCount = 1;
             layoutPrincipal.Padding = new Padding(20);
 
-            /
+            // Configurar filas del layout principal
             layoutPrincipal.RowStyles.Add(new RowStyle(SizeType.Absolute, 60)); // Banner
             layoutPrincipal.RowStyles.Add(new RowStyle(SizeType.Percent, 60)); // Matrices
             layoutPrincipal.RowStyles.Add(new RowStyle(SizeType.Absolute, 60)); // Botones
@@ -51,16 +51,16 @@ namespace CalculadoraMatrices
 
             this.Controls.Add(layoutPrincipal);
 
-            
+            // 1. Crear banner
             CrearBanner(layoutPrincipal);
 
-            
+            // 2. Crear sección de matrices
             CrearSeccionMatrices(layoutPrincipal);
 
-            
+            // 3. Crear botones
             CrearBotonesOperacion(layoutPrincipal);
 
-            
+            // 4. Crear pizarra de resultados
             CrearPizarraResultados(layoutPrincipal);
 
             this.ResumeLayout(false);
@@ -88,7 +88,7 @@ namespace CalculadoraMatrices
             layoutMatrices.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
             layoutMatrices.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
 
-            
+            // Crear grupos de matrices
             GroupBox grupoMatrizA = CrearGrupoMatriz("Primera Matriz", "A");
             GroupBox grupoMatrizB = CrearGrupoMatriz("Segunda Matriz", "B");
 
@@ -115,7 +115,7 @@ namespace CalculadoraMatrices
             layoutGrupo.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
             layoutGrupo.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
-           
+            // Panel de controles de dimensiones
             Panel panelDimensiones = new Panel();
             panelDimensiones.Dock = DockStyle.Fill;
             panelDimensiones.Height = 40;
@@ -155,7 +155,7 @@ namespace CalculadoraMatrices
 
             panelDimensiones.Controls.AddRange(new Control[] { lblFilas, spinFilas, lblColumnas, spinColumnas, btnCrear });
 
-            
+            // Crear DataGridView para la matriz
             DataGridView tabla = new DataGridView();
             tabla.Dock = DockStyle.Fill;
             tabla.BackgroundColor = Color.White;
@@ -167,13 +167,13 @@ namespace CalculadoraMatrices
             tabla.ColumnHeadersVisible = false;
             tabla.SelectionMode = DataGridViewSelectionMode.CellSelect;
 
-            
+            // Configurar tabla inicial (2x2)
             ActualizarTablaMatriz(2, 2, tabla);
 
-          
+            // Conectar eventos
             btnCrear.Click += (s, e) => ActualizarTablaMatriz((int)spinFilas.Value, (int)spinColumnas.Value, tabla);
 
-          
+            // Guardar referencias
             if (idMatriz == "A")
             {
                 this.spinFilasA = spinFilas;
@@ -256,12 +256,12 @@ namespace CalculadoraMatrices
             };
             btnLimpiar.FlatAppearance.BorderSize = 0;
 
-            
+            // Conectar eventos
             btnSumar.Click += RealizarSuma;
             btnMultiplicar.Click += RealizarMultiplicacion;
             btnLimpiar.Click += LimpiarTodo;
 
-           
+            // Efectos hover
             ConfigurarEfectosHover(btnSumar);
             ConfigurarEfectosHover(btnMultiplicar);
             ConfigurarEfectosHover(btnLimpiar);
@@ -361,31 +361,6 @@ namespace CalculadoraMatrices
             return html.ToString();
         }
 
-        private string FormatearMatrizOperacionesHtml(string[,] matriz, string titulo = "")
-        {
-            StringBuilder html = new StringBuilder();
-            if (!string.IsNullOrEmpty(titulo))
-            {
-                html.AppendLine($"=== {titulo} ===");
-            }
-
-            int filas = matriz.GetLength(0);
-            int columnas = matriz.GetLength(1);
-
-            for (int i = 0; i < filas; i++)
-            {
-                html.Append("[");
-                for (int j = 0; j < columnas; j++)
-                {
-                    html.Append($"{matriz[i, j],12}");
-                    if (j < columnas - 1) html.Append("  ");
-                }
-                html.AppendLine("]");
-            }
-            html.AppendLine();
-            return html.ToString();
-        }
-
         private void RealizarSuma(object sender, EventArgs e)
         {
             double[,] matrizA = LeerMatrizDesdeTabla(this.tablaMatrizA);
@@ -402,14 +377,23 @@ namespace CalculadoraMatrices
 
             this.pizarra.Clear();
 
-            this.pizarra.AppendText(FormatearMatrizHtml(matrizA, "Matriz A"));
-            this.pizarra.AppendText(FormatearMatrizHtml(matrizB, "Matriz B"));
+            // Usar el mismo formateo para todas las matrices
+            this.pizarra.AppendText("=== Matriz A ===\n");
+            this.pizarra.AppendText(Suma.MostrarMatriz(matrizA));
+            this.pizarra.AppendText("\n");
+
+            this.pizarra.AppendText("=== Matriz B ===\n");
+            this.pizarra.AppendText(Suma.MostrarMatriz(matrizB));
+            this.pizarra.AppendText("\n");
 
             string[,] matrizOperaciones = Suma.CrearMatrizOperacionesStr(matrizA, matrizB);
-            this.pizarra.AppendText(FormatearMatrizOperacionesHtml(matrizOperaciones, "Pasos intermedios de la suma"));
+            this.pizarra.AppendText("=== Pasos intermedios de la suma ===\n");
+            this.pizarra.AppendText(Suma.MostrarPasos(matrizOperaciones));
+            this.pizarra.AppendText("\n");
 
             double[,] resultado = Suma.SumarMatriz(matrizA, matrizB);
-            this.pizarra.AppendText(FormatearMatrizHtml(resultado, "Resultado final de la operación"));
+            this.pizarra.AppendText("=== Resultado final de la operación ===\n");
+            this.pizarra.AppendText(Suma.MostrarMatriz(resultado));
         }
 
         private void RealizarMultiplicacion(object sender, EventArgs e)
@@ -429,13 +413,18 @@ namespace CalculadoraMatrices
 
             this.pizarra.Clear();
 
-            // Mostrar matrices originales
-            this.pizarra.AppendText(FormatearMatrizHtml(matrizA, "Matriz A"));
-            this.pizarra.AppendText(FormatearMatrizHtml(matrizB, "Matriz B"));
+            // Usar el mismo formateo unificado para todas las matrices
+            this.pizarra.AppendText("=== Matriz A ===\n");
+            this.pizarra.AppendText(Suma.MostrarMatriz(matrizA));
+            this.pizarra.AppendText("\n");
+
+            this.pizarra.AppendText("=== Matriz B ===\n");
+            this.pizarra.AppendText(Suma.MostrarMatriz(matrizB));
+            this.pizarra.AppendText("\n");
 
             // Mostrar pasos del cálculo
             List<string> pasos = Multiplicacion.CrearPasosMultiplicacion(matrizA, matrizB);
-            this.pizarra.AppendText("=== Pasos del Cálculo: ===\n");
+            this.pizarra.AppendText("=== Pasos del Cálculo ===\n");
             foreach (string paso in pasos)
             {
                 this.pizarra.AppendText(paso + "\n");
@@ -444,7 +433,8 @@ namespace CalculadoraMatrices
 
             // Mostrar resultado final
             double[,] resultado = Multiplicacion.MultiplicarMatrices(matrizA, matrizB);
-            this.pizarra.AppendText(FormatearMatrizHtml(resultado, "Resultado Final"));
+            this.pizarra.AppendText("=== Resultado Final ===\n");
+            this.pizarra.AppendText(Suma.MostrarMatriz(resultado));
         }
 
         private void LimpiarTodo(object sender, EventArgs e)
@@ -477,7 +467,6 @@ namespace CalculadoraMatrices
 
         private void ConfigurarEstilosGlobales()
         {
-            
             this.BackColor = Color.FromArgb(240, 240, 240);
             this.ForeColor = Color.Black;
         }
